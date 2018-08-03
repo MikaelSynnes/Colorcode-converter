@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "create-react-app": "^1.5.2",
     "git": "^0.1.5",
     "react": "^16.4.2",
     "react-component": "0.0.0",
