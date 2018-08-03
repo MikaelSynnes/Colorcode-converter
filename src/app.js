@@ -7,7 +7,7 @@ class app extends Component {
       R: '255',
       G: '0',
       B: '0',
-      A: '100%',
+      A: '100',
       HUE: '0',
       S: '100',
       L: '50',
@@ -16,7 +16,7 @@ class app extends Component {
     };
     this.handleHex = this.handleHex.bind(this);
     this.handleRGB = this.handleRGB.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+
     this.handleHsl = this.handleHsl.bind(this);
 
   }
@@ -25,29 +25,21 @@ class app extends Component {
 
       <div>
         <div id="RGBA">
-
-
           <h1>RGBA</h1>
-          <form >
-
-
+          <form>
             <input type="text" maxlength="3" name="R" value={this.state.R} onChange={this.handleRGB} />
             <input type="text" maxlength="3" name="G" value={this.state.G} onChange={this.handleRGB} />
             <input type="text" maxlength="3" name="B" value={this.state.B} onChange={this.handleRGB} />
-            <input type="text" maxlength="3" name="A" value={this.state.A} onChange={this.handleRGB} />
-
-            <input type="submit" value="Submit" />
-
-
+            <input type="text" maxlength="3" name="A" value={this.state.A} onChange={this.handleRGB} /><p>%</p>
           </form>
 
         </div>
         <div id="HSL">
           <h1> HSL</h1>
           <form>
-            <input type="text" name="HUE" value={this.state.HUE} onChange={this.handleHsl} />
-            <input type="text" name="S" value={this.state.S} onChange={this.handleHsl} />
-            <input type="text" name="L" value={this.state.L} onChange={this.handleHsl} />
+            <input type="text" name="HUE" value={this.state.HUE} onChange={this.handleHsl} /><p>°</p>
+            <input type="text" name="S" value={this.state.S} onChange={this.handleHsl} /><p>%</p>
+            <input type="text" name="L" value={this.state.L} onChange={this.handleHsl} /><p>%</p>
           </form>
         </div>
         <div id="HEX">
@@ -56,13 +48,17 @@ class app extends Component {
 
 
         </div>
-        <div id="Color" style={{ backgroundColor: this.state.HEX }}>
+      
+        <div id="Color" style={{ backgroundColor: this.state.HEX, opacity:this.state.A/100 }}>
+        <h1> Color</h1>
         </div>
 
       </div>
     );
 
   }
+
+  //Handles events caused by the Hsl block.
   handleHsl(event) {
     this.setState({
       [event.target.name]: event.target.value
@@ -75,9 +71,10 @@ class app extends Component {
         var newg = rgb[1];
         var newb = rgb[2];
         this.setState({
-          R: newr,
-          G: newg,
-          B: newb
+          R: Math.round(newr),
+          G: Math.round(newg),
+          B: Math.round(newb
+)
         }, () => {
           this.setState({
             HEX: '#' + this.convertToHex(this.state.R) + this.convertToHex(this.state.G) + this.convertToHex(this.state.B)
@@ -88,11 +85,12 @@ class app extends Component {
       })
   }
 
-
+  //handles events from the rgb block
   handleRGB(event) {
     this.setState({
       [event.target.name]: event.target.value
     }
+      //callback to make sure the state is finished updating before calling a new state on hex
       , () =>
         this.setState({
           HEX: '#' + this.convertToHex(this.state.R) + this.convertToHex(this.state.G) + this.convertToHex(this.state.B)
@@ -100,12 +98,12 @@ class app extends Component {
 
     )
   }
-
+  //handles events from the hex block
   handleHex(event) {
 
     this.setState({
       [event.target.name]: event.target.value,
-    }
+    }//callback to make sure the state is finished updating before calling a new state
       , () =>
         this.setState({
 
@@ -117,12 +115,7 @@ class app extends Component {
     )
 
   }
-  handleSubmit(event) {
-
-    event.preventDefault();
-
-    this.setState({ HEX: this.convertToHex(this.state.R) + this.convertToHex(this.state.G) + this.convertToHex(this.state.B) })
-  }
+  //convering a number to hex
   convertToHex(int) {
     if (int > 255) {
       return "To high";
@@ -144,80 +137,89 @@ class app extends Component {
   rgbToHsl(float) {
     return float / 255;
   }
- /* HslToRgb(h, s, l) {
+  /*
+ 
+  // first attempt at making the Hsl algorithm.
+ 
+  HslToRgb(h, s, l) {
+ 
+     s = s / 100;
+     l = l / 100;
+     var hue = h / 360;
+ 
+     var r, g, b;
+     var temp1, temp2;
+     var tempr, tempg, tempb;
+     if (s === 0) {
+       r = g = b = l;
+ 
+     }
+     if (l < 0.5) {
+       temp1 = l * (1 + s);
+     } else if (l >= 0.5) {
+       temp1 = l + s - (l * s);
+     }
+     temp2 = 2 * l - temp1;
+ 
+     console.log('hue: ' + hue);
+     tempr = (hue + 1 / 3);
+     tempg = (hue);
+     tempb = (hue - 1 / 3);
+     console.log('tempr: ' + tempr + 'tempg: ' + tempg + 'tempb: ' + tempb)
+ 
+ 
+     r = this.temptest(tempr, temp1, temp2);
+     g = this.temptest(tempg, temp1, temp2);
+     b = this.temptest(tempb, temp1, temp2);
+     console.log('r: ' + r + 'g: ' + g + 'b: ' + b)
+ 
+     this.setState({
+       R: (r * 255),
+       G: (g * 255),
+       B: (b * 255)
+     }, () => {
+       this.setState({
+         HEX: '#' + this.convertToHex(this.state.R) + this.convertToHex(this.state.G) + this.convertToHex(this.state.B)
+       })
+     }
+     )
+   }
+   temptest(int, temp1, temp2) {
+ 
+     if (int < 0) {
+       int = int + 1;
+     }
+     if (int > 1) {
+       int = int - 1;
+     }
+     console.log(int);
+     if (int < 1 / 6) {
+       console.log("function 1");
+       return (temp2 + (temp1 - temp2) * 6 * int);
+ 
+     }
+     else if (int < 1 / 2) {
+       console.log("function 2");
+       return temp2;
+ 
+     }
+     else if (int < 2 / 3) {
+       console.log("function 3");
+       return (temp2 + (temp1 - temp2) * (0.666 - int) * 6);
+ 
+     }
+     else {
+       console.log("This shouldnt happen");
+     }
+ 
+ 
+   }
+   */
 
-    s = s / 100;
-    l = l / 100;
-    var hue = h / 360;
 
-    var r, g, b;
-    var temp1, temp2;
-    var tempr, tempg, tempb;
-    if (s === 0) {
-      r = g = b = l;
+  //function to convert hsl to rgb.
+  //returns array with 3 values ARray[r,g,b]
 
-    }
-    if (l < 0.5) {
-      temp1 = l * (1 + s);
-    } else if (l >= 0.5) {
-      temp1 = l + s - (l * s);
-    }
-    temp2 = 2 * l - temp1;
-
-    console.log('hue: ' + hue);
-    tempr = (hue + 1 / 3);
-    tempg = (hue);
-    tempb = (hue - 1 / 3);
-    console.log('tempr: ' + tempr + 'tempg: ' + tempg + 'tempb: ' + tempb)
-
-
-    r = this.temptest(tempr, temp1, temp2);
-    g = this.temptest(tempg, temp1, temp2);
-    b = this.temptest(tempb, temp1, temp2);
-    console.log('r: ' + r + 'g: ' + g + 'b: ' + b)
-
-    this.setState({
-      R: (r * 255),
-      G: (g * 255),
-      B: (b * 255)
-    }, () => {
-      this.setState({
-        HEX: '#' + this.convertToHex(this.state.R) + this.convertToHex(this.state.G) + this.convertToHex(this.state.B)
-      })
-    }
-    )
-  }
-  temptest(int, temp1, temp2) {
-
-    if (int < 0) {
-      int = int + 1;
-    }
-    if (int > 1) {
-      int = int - 1;
-    }
-    console.log(int);
-    if (int < 1 / 6) {
-      console.log("function 1");
-      return (temp2 + (temp1 - temp2) * 6 * int);
-
-    }
-    else if (int < 1 / 2) {
-      console.log("function 2");
-      return temp2;
-
-    }
-    else if (int < 2 / 3) {
-      console.log("function 3");
-      return (temp2 + (temp1 - temp2) * (0.666 - int) * 6);
-
-    }
-    else {
-      console.log("This shouldnt happen");
-    }
-
-
-  }
-  */
   hslToRgb(h, s, l) {
     var r, g, b;
     h = h / 360;
@@ -253,6 +255,8 @@ class app extends Component {
     return [r * 255, g * 255, b * 255];
   }
 
+
+  //function to update the data in hsl block
   updateHsl() {
     var re = this.rgbToHsl(this.state.R);
     var gr = this.rgbToHsl(this.state.G);
@@ -302,7 +306,7 @@ class app extends Component {
   }
 
 
-
+  //converts a number to hex
   intToHexDecimal(int) {
     var str = int.toString();
     if (int >= 15) {
