@@ -1,0 +1,28 @@
+#RGBA input{
+    float:left;
+
+   
+}
+#RGBA{
+    background:red;
+    clear:both;
+}
+#HSL{
+    clear:both;
+    float:left;
+}
+#HEX{
+    overflow:hidden;
+    clear:both;
+}
+
+body {
+    padding-left: 20%;
+    padding-right: 20%;
+    margin: 0;
+}
+#Color{
+    width:1000px;
+    height:150px;
+   
+}
