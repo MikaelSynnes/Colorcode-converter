@@ -331,11 +331,5 @@ class app extends Component {
       return str;
     }
   }
-
-
-
-
 }
-
-
 export default app;
